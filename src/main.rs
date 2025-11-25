@@ -7,7 +7,7 @@ use std::net::Ipv4Addr;
 
 mod time;
 
-fn handle_request(mut stream: TcpStream) -> io::Result<()> 
+fn handle_request(mut stream: TcpStream) -> Result<(), io::Error>
 {
     let current_time: String = time::get_time();
     println!("- {}:", current_time);
