@@ -4,47 +4,13 @@ use std::io::Read;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::net::Ipv4Addr;
-use std::time::SystemTime;
-use std::time::UNIX_EPOCH;
 
-fn get_timestamp() -> String 
-{
-    let now = SystemTime::now();
-    let datetime = now.duration_since(UNIX_EPOCH)
-        .unwrap();
-
-    let total_secs = datetime.as_secs();
-    let hours = (total_secs / 3600) % 24;
-    let minutes = (total_secs / 60) % 60;
-    let seconds = total_secs % 60;
-
-    return format!("[{:02}:{:02}:{:02}]", 
-        hours, 
-        minutes, 
-        seconds
-    );
-}
+mod time;
 
 fn handle_request(mut stream: TcpStream) -> io::Result<()> 
 {
-    let timestamp: String = get_timestamp();
-    println!("- {}:", timestamp);
-    
-    // Parsing Modbus TCP Request
-    // Modbus TCP ADU (Application Data Unit):
-    // 
-    // HEADER (7 bytes):
-    // 0-1  Transaction ID       (2 bytes)  -> Identifies the transaction, used to correlate request/response
-    // 2-3  Protocol ID          (2 bytes)  -> Always 0x0000 for Modbus
-    // 4-5  Length               (2 bytes)  -> Number of bytes that follow (Unit ID + PDU)
-    // 6    Unit ID              (1 byte)   -> Identifies the slave device
-    //
-    // PDU (Protocol Data Unit):
-    // 7    Function Code        (1 byte)   -> Which Modbus function to execute (e.g., read registers)
-    // 8-9  Starting Address     (2 bytes)  -> Starting address of coil/register
-    // 10-11 Quantity of regs    (2 bytes)  -> Number of registers/coils to read or write
-    //
-    // Note: the minimum complete frame is 12 bytes (7 header + 5 PDU)
+    let current_time: String = time::get_time();
+    println!("- {}:", current_time);
     
     let mut buffer = [0u8; 512];
     let size: usize = stream.read(&mut buffer)?;
