@@ -25,10 +25,37 @@ pub fn read_holding_registers(
     response.extend(&transaction_id.to_be_bytes());
     response.extend(&protocol_id.to_be_bytes());
     response.extend(&(response_length as u16).to_be_bytes());
+    
     response.push(unit_id);
     response.push(0x03);
     response.push(byte_count);
+    
     response.extend(&data);
+
+    stream.write_all(&response)?;
+    return Ok(());
+}
+
+pub fn handle_illegal_function(
+    mut stream: TcpStream,
+    transaction_id: u16,
+    protocol_id: u16,
+    unit_id: u8,
+    function_code: u8,
+    exception_code: u8
+) -> Result<(), io::Error> 
+{
+    let pdu_len: u16 = 3;
+    let exception_fn: u8 = function_code | 0x80;
+    let mut response: Vec<u8> = Vec::new();
+
+    response.extend(&transaction_id.to_be_bytes());
+    response.extend(&protocol_id.to_be_bytes());
+    response.extend(&pdu_len.to_be_bytes());
+    
+    response.push(unit_id);
+    response.push(exception_fn);
+    response.push(exception_code);
 
     stream.write_all(&response)?;
     return Ok(());

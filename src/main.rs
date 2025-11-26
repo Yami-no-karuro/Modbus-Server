@@ -73,6 +73,15 @@ fn handle_request(mut stream: TcpStream) -> Result<(), io::Error>
             unit_id, 
             quantity
         );
+    } else {
+        let _ = functions::handle_illegal_function(
+            stream,
+            transaction_id,
+            protocol_id,
+            unit_id,
+            function,
+            0x01
+        );
     }
 
     return Ok(());
