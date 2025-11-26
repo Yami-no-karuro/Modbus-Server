@@ -1,11 +1,44 @@
 use std::thread;
 use std::io;
 use std::io::Read;
+use std::io::Write;
 use std::net::TcpListener;
 use std::net::TcpStream;
 use std::net::Ipv4Addr;
 
 mod time;
+
+fn read_holding_registers(
+    mut stream: TcpStream, 
+    transaction_id: u16, 
+    protocol_id: u16,
+    _length: u16,
+    unit_id: u8,
+    _starting_address: u16,
+    quantity: u16
+) -> Result<(), io::Error>
+{
+    let byte_count: u8 = (quantity * 2) as u8;
+    let mut data: Vec<u8> = Vec::new();
+    for _ in 0..quantity {
+        data.push(0x12); // Example data...
+        data.push(0x34); // Example data...
+    }
+
+    let response_length: usize = 3 + data.len();
+    let mut response: Vec<u8> = Vec::new();
+    
+    response.extend(&transaction_id.to_be_bytes());
+    response.extend(&protocol_id.to_be_bytes());
+    response.extend(&(response_length as u16).to_be_bytes());
+    response.push(unit_id);
+    response.push(0x03);
+    response.push(byte_count);
+    response.extend(&data);
+
+    stream.write_all(&response)?;
+    return Ok(());
+}
 
 fn handle_request(mut stream: TcpStream) -> Result<(), io::Error>
 {
@@ -61,6 +94,18 @@ fn handle_request(mut stream: TcpStream) -> Result<(), io::Error>
     println!("Function:         {}", function_literal);
     println!("Starting addr:    {}", starting_address);
     println!("Quantity:         {}", quantity);
+    
+    if function == 0x03 {
+        let _ = read_holding_registers(
+            stream, 
+            transaction_id, 
+            protocol_id, 
+            length, 
+            unit_id, 
+            starting_address, 
+            quantity
+        );
+    }
     
     return Ok(());
 }
