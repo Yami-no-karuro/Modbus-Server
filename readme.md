@@ -4,7 +4,7 @@
 
 Modbus (or MODBUS) is a client/server data communications protocol in the application layer.  
 It was originally designed for use with programmable logic controllers (PLCs), but has become a de facto standard communication protocol for communication between industrial electronic devices in a wide range of buses and networks.  
-(See [Netcat](https://en.wikipedia.org/wiki/Netcat) on [Wikipedia](https://en.wikipedia.org/) for more details)
+(See [Modbus](https://en.wikipedia.org/wiki/Modbus) on [Wikipedia](https://en.wikipedia.org/) for more details)
 
 ### TCP ADU (Application Data Unit)
 
@@ -24,7 +24,7 @@ Note: the minimum complete frame is 12 bytes (7 header + 5 PDU)
 ### How to get things running 
 
 Launch the server via `cargo run`.  
-Once the server is up and running we can emulate actual requests via [netcat](en.wikipedia.org/wiki/Netcat):
+Once the server is up and running we can emulate actual requests via [netcat](https://en.wikipedia.org/wiki/Netcat):
 
 ```bash
 # [
